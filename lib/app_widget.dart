@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hype_now/src/ui/controllers/theme_controller.dart';
-import 'package:hype_now/src/ui/pages/welcome_page.dart';
+
 import 'package:hype_now/src/ui/routes/app_routes.dart';
 import 'package:hype_now/src/ui/routes/router.dart';
 import 'package:hype_now/src/ui/theme/app_theme.dart';
@@ -26,14 +26,5 @@ class AppWidget extends StatelessWidget {
         );
       },
     );
-  }
-}
-
-class _RootPage extends StatelessWidget {
-  const _RootPage();
-
-  @override
-  Widget build(BuildContext context) {
-    return WelcomePage();
   }
 }

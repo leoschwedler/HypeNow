@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hype_now/src/ui/pages/home_page.dart';
-import 'package:hype_now/src/ui/pages/signin_page.dart';
-import 'package:hype_now/src/ui/pages/signup_page.dart';
-import 'package:hype_now/src/ui/pages/splash_page.dart';
-import 'package:hype_now/src/ui/pages/welcome_page.dart';
+import 'package:hype_now/src/ui/pages/auth/home_page.dart';
+import 'package:hype_now/src/ui/pages/auth/signin_page.dart';
+import 'package:hype_now/src/ui/pages/auth/signup_page.dart';
+import 'package:hype_now/src/ui/pages/auth/splash_page.dart';
+import 'package:hype_now/src/ui/pages/auth/welcome_page.dart';
 import 'package:hype_now/src/ui/routes/app_routes.dart';
 
 final Map<String, WidgetBuilder> routes = {

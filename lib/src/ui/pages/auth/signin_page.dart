@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hype_now/src/ui/routes/app_routes.dart';
 import 'package:hype_now/src/ui/theme/app_spacing.dart';
+import 'package:hype_now/src/ui/widgets/splash_logo.dart';
+import 'package:hype_now/src/ui/widgets/auth_header.dart';
+import '../../../dependencies/injector.dart';
+import '../../controllers/signin_controller.dart';
 
 class SigninPage extends StatefulWidget {
   const SigninPage({super.key});
@@ -10,93 +14,19 @@ class SigninPage extends StatefulWidget {
 }
 
 class _SigninPageState extends State<SigninPage> with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isPasswordVisible = false;
-  bool _isLoading = false;
+  late final SigninController _controller;
 
   @override
   void initState() {
     super.initState();
-    _initializeAnimations();
-  }
-
-  void _initializeAnimations() {
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
-
-    // Iniciar animações com delay escalonado
-    Future.delayed(const Duration(milliseconds: 200), () {
-      _fadeController.forward();
-    });
-
-    Future.delayed(const Duration(milliseconds: 400), () {
-      _slideController.forward();
-    });
+    _controller = getIt<SigninController>();
+    _controller.initializeAnimations(this);
   }
 
   @override
   void dispose() {
-    _fadeController.dispose();
-    _slideController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
+    _controller.dispose();
     super.dispose();
-  }
-
-  Future<void> _handleSignIn() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simular processo de login
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-
-      // Navegar para a tela principal (home)
-      Navigator.of(context).pushReplacementNamed('/home');
-    }
-  }
-
-  void _handleForgotPassword() {
-    // TODO: Implementar navegação para tela de recuperação de senha
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Funcionalidade de recuperação de senha em desenvolvimento',
-        ),
-      ),
-    );
   }
 
   @override
@@ -106,8 +36,13 @@ class _SigninPageState extends State<SigninPage> with TickerProviderStateMixin {
     final textTheme = theme.textTheme;
     final size = MediaQuery.of(context).size;
 
+    final logoSize = size.width * 0.25;
+    const maxLogoSize = 120.0;
+    final responsiveLogoSize = logoSize.clamp(80.0, maxLogoSize);
+
     return Scaffold(
       backgroundColor: colorScheme.surface,
+      appBar: const AuthHeader(),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(AppSpacing.screenPadding),
@@ -124,12 +59,11 @@ class _SigninPageState extends State<SigninPage> with TickerProviderStateMixin {
                 children: [
                   // Logo e título
                   FadeTransition(
-                    opacity: _fadeAnimation,
+                    opacity: _controller.fadeAnimation,
                     child: Column(
                       children: [
-                        Icon(
-                          Icons.lock_outline_rounded,
-                          size: 80,
+                        SplashLogo(
+                          size: responsiveLogoSize,
                           color: colorScheme.primary,
                         ),
                         SizedBox(height: AppSpacing.md),
@@ -155,16 +89,16 @@ class _SigninPageState extends State<SigninPage> with TickerProviderStateMixin {
 
                   // Formulário de login
                   SlideTransition(
-                    position: _slideAnimation,
+                    position: _controller.slideAnimation,
                     child: FadeTransition(
-                      opacity: _fadeAnimation,
+                      opacity: _controller.fadeAnimation,
                       child: Form(
-                        key: _formKey,
+                        key: _controller.formKey,
                         child: Column(
                           children: [
                             // Campo de email
                             TextFormField(
-                              controller: _emailController,
+                              controller: _controller.emailController,
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
@@ -192,8 +126,8 @@ class _SigninPageState extends State<SigninPage> with TickerProviderStateMixin {
 
                             // Campo de senha
                             TextFormField(
-                              controller: _passwordController,
-                              obscureText: !_isPasswordVisible,
+                              controller: _controller.passwordController,
+                              obscureText: !_controller.isPasswordVisible,
                               textInputAction: TextInputAction.done,
                               decoration: InputDecoration(
                                 labelText: 'Senha',
@@ -204,16 +138,13 @@ class _SigninPageState extends State<SigninPage> with TickerProviderStateMixin {
                                 ),
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _isPasswordVisible
+                                    _controller.isPasswordVisible
                                         ? Icons.visibility_off
                                         : Icons.visibility,
                                     color: colorScheme.onSurfaceVariant,
                                   ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _isPasswordVisible = !_isPasswordVisible;
-                                    });
-                                  },
+                                  onPressed:
+                                      _controller.togglePasswordVisibility,
                                 ),
                               ),
                               validator: (value) {
@@ -233,7 +164,10 @@ class _SigninPageState extends State<SigninPage> with TickerProviderStateMixin {
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
-                                onPressed: _handleForgotPassword,
+                                onPressed:
+                                    () => _controller.handleForgotPassword(
+                                      context,
+                                    ),
                                 child: Text(
                                   'Esqueci minha senha?',
                                   style: textTheme.bodyMedium?.copyWith(
@@ -250,9 +184,13 @@ class _SigninPageState extends State<SigninPage> with TickerProviderStateMixin {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: _isLoading ? null : _handleSignIn,
+                                onPressed:
+                                    _controller.isLoading
+                                        ? null
+                                        : () =>
+                                            _controller.handleSignIn(context),
                                 child:
-                                    _isLoading
+                                    _controller.isLoading
                                         ? SizedBox(
                                           height: 20,
                                           width: 20,
@@ -282,7 +220,7 @@ class _SigninPageState extends State<SigninPage> with TickerProviderStateMixin {
 
                   // Link para cadastro
                   FadeTransition(
-                    opacity: _fadeAnimation,
+                    opacity: _controller.fadeAnimation,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

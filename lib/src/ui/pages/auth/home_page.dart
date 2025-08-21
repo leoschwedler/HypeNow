@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hype_now/src/ui/theme/app_spacing.dart';
+import 'package:hype_now/src/ui/widgets/auth_header.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -12,12 +13,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Hype Now'),
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
-        elevation: 0,
-      ),
+      appBar: const AuthHeader(),
       body: Center(
         child: Padding(
           padding: EdgeInsets.all(AppSpacing.screenPadding),

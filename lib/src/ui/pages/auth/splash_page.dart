@@ -42,6 +42,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
     return Scaffold(
       backgroundColor: colorScheme.background,
+
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -67,7 +68,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                     );
                   },
                 ),
-                const SizedBox(height: AppSpacing.xl2),
+                const SizedBox(height: AppSpacing.md),
                 AnimatedBuilder(
                   animation: _controller.fadeAnimation,
                   builder: (context, child) {
@@ -77,14 +78,14 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                     );
                   },
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.md),
                 AnimatedBuilder(
                   animation: _controller.fadeAnimation,
                   builder: (context, child) {
                     return Opacity(
                       opacity: _controller.fadeAnimation.value,
                       child: const SplashSubtitle(
-                        text: 'Sua plataforma de hype',
+                        text: 'Sua plataforma de Festas',
                       ),
                     );
                   },

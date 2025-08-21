@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hype_now/src/ui/routes/app_routes.dart';
 import 'package:hype_now/src/ui/widgets/splash_logo.dart';
+import 'package:hype_now/src/ui/widgets/auth_header.dart';
+import '../../../dependencies/injector.dart';
+import '../../controllers/welcome_controller.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -11,65 +14,13 @@ class WelcomePage extends StatefulWidget {
 
 class _WelcomePageState extends State<WelcomePage>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _fadeLogo;
-  late final Animation<Offset> _slideLogo;
-  late final Animation<double> _fadeTitle;
-  late final Animation<Offset> _slideTitle;
-  late final Animation<double> _fadeButtons;
-  late final Animation<Offset> _slideButtons;
+  late final WelcomeController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _fadeLogo = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-    );
-    _slideLogo = Tween<Offset>(
-      begin: const Offset(0, 0.12),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOutCubic),
-      ),
-    );
-
-    _fadeTitle = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.25, 0.75, curve: Curves.easeOut),
-    );
-    _slideTitle = Tween<Offset>(
-      begin: const Offset(0, 0.10),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.25, 0.75, curve: Curves.easeOutCubic),
-      ),
-    );
-
-    _fadeButtons = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
-    );
-    _slideButtons = Tween<Offset>(
-      begin: const Offset(0, 0.08),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.5, 1.0, curve: Curves.easeOutCubic),
-      ),
-    );
-
-    _controller.forward();
+    _controller = getIt<WelcomeController>();
+    _controller.initializeAnimations(this);
   }
 
   @override
@@ -86,6 +37,7 @@ class _WelcomePageState extends State<WelcomePage>
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
+      appBar: const AuthHeader(),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final maxWidth = constraints.maxWidth;
@@ -108,9 +60,9 @@ class _WelcomePageState extends State<WelcomePage>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     FadeTransition(
-                      opacity: _fadeLogo,
+                      opacity: _controller.fadeLogo,
                       child: SlideTransition(
-                        position: _slideLogo,
+                        position: _controller.slideLogo,
                         child: SplashLogo(
                           size: logoSize,
                           color: colorScheme.primary,
@@ -119,9 +71,9 @@ class _WelcomePageState extends State<WelcomePage>
                     ),
                     const SizedBox(height: 28),
                     FadeTransition(
-                      opacity: _fadeTitle,
+                      opacity: _controller.fadeTitle,
                       child: SlideTransition(
-                        position: _slideTitle,
+                        position: _controller.slideTitle,
                         child: Column(
                           children: [
                             Text(
@@ -147,9 +99,9 @@ class _WelcomePageState extends State<WelcomePage>
                     ),
                     const SizedBox(height: 32),
                     FadeTransition(
-                      opacity: _fadeButtons,
+                      opacity: _controller.fadeButtons,
                       child: SlideTransition(
-                        position: _slideButtons,
+                        position: _controller.slideButtons,
                         child: _WelcomeActions(
                           onTapSignIn:
                               () => Navigator.of(
